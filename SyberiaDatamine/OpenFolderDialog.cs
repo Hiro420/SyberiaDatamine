@@ -48,7 +48,6 @@ internal class OpenFolderDialog
 					frm.SetDefaultFolder(directoryShellItem);
 				}
 			}
-
 			IntPtr ownerHandle = owner != null ? new System.Windows.Interop.WindowInteropHelper(owner).Handle : IntPtr.Zero;
 			if ((ownerHandle == IntPtr.Zero ? frm.Show() : frm.Show(ownerHandle)) == NativeMethods.S_OK)
 			{
