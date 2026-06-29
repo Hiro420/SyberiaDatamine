@@ -64,7 +64,7 @@ jobs:
 
       - name: Publish for ${{ matrix.rid }} (${{ matrix.mode }})
         run: >
-          dotnet publish SyberiaDatamine.csproj
+          dotnet publish SyberiaDatamine\SyberiaDatamine.csproj
           --configuration Release
           --framework net8.0
           --runtime ${{ matrix.rid }}
