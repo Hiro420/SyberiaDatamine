@@ -1,4 +1,4 @@
-name: Cross-Platform Build
+name: Windows Build
 
 permissions:
   actions: write
@@ -10,11 +10,15 @@ on:
       - main
     paths:
       - "**.cs"
+      - "**.xaml"
+      - "**.csproj"
   pull_request:
     branches:
       - main
     paths:
       - "**.cs"
+      - "**.xaml"
+      - "**.csproj"
   workflow_dispatch:
 
 jobs:
@@ -29,26 +33,10 @@ jobs:
             mode: bundled
             single_file: true
             output: artifacts/win-x64-bundled
-          - rid: linux-x64
-            mode: bundled
-            single_file: true
-            output: artifacts/linux-x64-bundled
-          - rid: linux-arm64
-            mode: bundled
-            single_file: true
-            output: artifacts/linux-arm64-bundled
           - rid: win-x64
             mode: expanded
             single_file: false
             output: artifacts/win-x64-expanded
-          - rid: linux-x64
-            mode: expanded
-            single_file: false
-            output: artifacts/linux-x64-expanded
-          - rid: linux-arm64
-            mode: expanded
-            single_file: false
-            output: artifacts/linux-arm64-expanded
 
     steps:
       - name: Fetch source
@@ -57,17 +45,18 @@ jobs:
       - name: Install .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 10.0.x
 
       - name: Restore project packages
-        run: dotnet restore
+        run: dotnet restore SyberiaDatamine\SyberiaDatamine.csproj
 
       - name: Publish for ${{ matrix.rid }} (${{ matrix.mode }})
         run: >
           dotnet publish SyberiaDatamine\SyberiaDatamine.csproj
           --configuration Release
-          --framework net8.0
+          --framework net10.0-windows
           --runtime ${{ matrix.rid }}
+          --self-contained true
           --output ${{ matrix.output }}
           -p:PublishSingleFile=${{ matrix.single_file }}
 
@@ -76,32 +65,3 @@ jobs:
         with:
           name: build-${{ matrix.rid }}-${{ matrix.mode }}
           path: ${{ matrix.output }}
-
-  prune-artifacts:
-    name: Remove Previous Artifacts
-    runs-on: ubuntu-latest
-    needs: package
-
-    steps:
-      - name: Delete artifacts from older runs
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const currentRun = process.env.GITHUB_RUN_ID;
-
-            const { data } = await github.rest.actions.listArtifactsForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              per_page: 100
-            });
-
-            for (const item of data.artifacts) {
-              if (item.workflow_run && item.workflow_run.id.toString() !== currentRun) {
-                await github.rest.actions.deleteArtifact({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  artifact_id: item.id
-                });
-              }
-            }
