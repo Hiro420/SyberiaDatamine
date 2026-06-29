@@ -8,7 +8,8 @@ namespace SyberiaDatamine;
 internal static class FfmpegBootstrapper
 {
 	private static readonly Uri Ffmpeg7zUrl = new(
-		"https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2024-04-30-12-51/ffmpeg-n7.0-21-gfb8f0ea7b3-win64-gpl-shared-7.0.zip");
+		"https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2024-04-30-12-51/ffmpeg-n7.0-21-gfb8f0ea7b3-win64-gpl-shared-7.0.zip"
+	);
 
 	private static readonly string AppFfmpegDir = Path.Combine(
 		Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
